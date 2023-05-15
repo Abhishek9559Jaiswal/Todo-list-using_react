@@ -1,106 +1,51 @@
-import React from 'react';
-import './App.css';
-import Tooltip from './Tooltip';
+// -----------importing react , useEffect and useState hooks --------//
+import React, { useEffect, useState } from 'react'
 
-
-class App extends React.Component{
-
-//we have to create the state
-  constructor(){
-    super();
-    this.state={
-      position:"top",
-      hovering:false,
-    };
-  }
-
-  //handleClick function which handle the position
-  handleClick=(pos)=>{
-    this.setState({
-      position:pos,
-    })
-  };
-
-
-  //handleMouseEnter function which handle the hovering condintion
-
-  handleMouseEnter=()=>{
-    this.setState({
-      hovering:true,
-    });
-  };
+import './App.css'
+//---------------import TodoContainer Component-----------------------//
+import TodoContainer from './Components/TodoContainer'
+// --------------------Bars for loading wait animation ---------------//
+import { Bars } from "react-loader-spinner";
 
 
 
-    //handleMouseEnter function which handle the hovering condintion
+// ----------main Component of this Todo App -------------------------//
+const App = () => {
 
-  handleMouseLeave=()=>{
-    this.setState({
-      hovering:false
-    })
-  }
+    //------after loading json we put whole object in json of useState----//
+    const [json, setjson] = useState([]);
+    //------rendering whole App component after loading ----------------//
+    const [loading, setLoading] = useState(false);
+
+    //--------useEffect hook with empty Array dependendency means --------
+    //-----fetching api with no side effect for disturb our app----------
+    useEffect(() => {
+        // inbuilt function for fetch API 
+        fetch("https://jsonplaceholder.typicode.com/todos")
+            .then((response) => response.json())
+            .then((json) => {
+                setTimeout(() => {
+                    // after fething json we update json with calling this function
+                    // setJson that change value of json With help of useEffect Hook
+                    setjson(json)
+                    setLoading(true);
+                }, 1000);
+                //    console.log(json)
+            });
+    }, []);
 
 
-  //render part of the class based component
-
-  render(){
     return (
-  //app return main jsx
+        <div>
+            {/* after loading Api rendering TodoContainer Component If not ! then Show thw Waiting Bar  */}
+            {loading ? (
+                <TodoContainer jsonTodos={json} />
+            ) : (
+                <Bars height="180" width="180" color="#4fa94d" ariaLabel="bars-loading" visible={true} />
+            )}
 
-      <div className="App">
-{  //position of the all position button
-}
-        <div className='btn-position'>
-          <div className='grp-name'>
-            select the position of the hovering!!
-          </div>
-          <button
-          className= {this.state.position=== 'top' ? "btn active" :"btn" }
-          onClick={(e)=>{
-            this.handleClick('top');
-          }}>
-            top
-          </button>
-          <button
-          className={this.state.position=== 'left' ? "btn active" :"btn"}
-          onClick={(e)=>{
-            this.handleClick('left');
-          }}>
-            left
-          </button>
-          <button
-          className={this.state.position=== 'right' ? "btn active" :"btn"}
-          onClick={(e)=>{
-            this.handleClick('right');
-          }}>
-            right
-          </button>
-          <button
-          className={this.state.position=== 'down' ? "btn active" :"btn"}
-          onClick={(e)=>{
-            this.handleClick('down');
-          }}>
-            down
-          </button>
         </div>
-{        //hover button 
-
-}        <div id="button-container">
-          <button
-          className='btn hover-btn'
-          onMouseOver={this.handleMouseEnter}
-          onMouseOut={this.handleMouseLeave}
-          >
-
-            Hover Over Me!!
-          </button>
-          {this.state.hovering && <Tooltip position={this.state.position}/>}
-        </div>
-
-
-      </div>
-    );
-  }
+    )
 }
 
-export default App;
+export default App
